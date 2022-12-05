@@ -86,22 +86,26 @@ def cli():
     if (transcriber._has_parallel_devices()):
         print("Using parallel devices:", transcriber.parallel_device_list)
 
-    for audio_path in args.pop("audio"):
-        sources = []
-
-        # Detect URL and download the audio
-        if (uri_validator(audio_path)):
-            # Download from YouTube/URL directly
-            for source_path in  download_url(audio_path, maxDuration=-1, destinationDirectory=output_dir, playlistItems=None):
-                source_name = os.path.basename(source_path)
-                sources.append({ "path": source_path, "name": source_name })
-        else:
-            sources.append({ "path": audio_path, "name": os.path.basename(audio_path) })
-
-        for source in sources:
-            source_path = source["path"]
-            source_name = source["name"]
-
+    # for audio_path in args.pop("audio"):
+    #     sources = []
+    #
+    #     # Detect URL and download the audio
+    #     if (uri_validator(audio_path)):
+    #         # Download from YouTube/URL directly
+    #         for source_path in  download_url(audio_path, maxDuration=-1, destinationDirectory=output_dir, playlistItems=None):
+    #             source_name = os.path.basename(source_path)
+    #             sources.append({ "path": source_path, "name": source_name })
+    #
+    #     else:
+    #         sources.append({ "path": audio_path, "name": os.path.basename(audio_path) })
+    #
+    #     for source in sources:
+    #         source_path = source["path"]
+    #         source_name = source["name"]
+    for root, dirs, files in os.walk(args.pop("audio")[0]):
+        for file in files:
+            source_path = os.path.join(root, file)
+            source_name = file
             result = transcriber.transcribe_file(model, source_path, temperature=temperature, 
                                                 vad=vad, vadMergeWindow=vad_merge_window, vadMaxMergeSize=vad_max_merge_size, 
                                                 vadPadding=vad_padding, vadPromptWindow=vad_prompt_window, **args)
